@@ -26,6 +26,6 @@
     "zendframework/zend-version": "2.*"
   },
   "autoload": {
-    "psr-0": {"MBtecGoogleMaps": "src/"}
+    "psr-0": {"MBtecZfGoogleMaps": "src/"}
   }
 }
