@@ -1,6 +1,6 @@
 {
   "name":        "mb-tec/zf-email",
-  "description": "Email service for Zend Framework 2",
+  "description": "Email Service for Zend Framework 2",
   "homepage":    "https://bitbucket.org/mbuesing/zf-email",
   "type":        "library",
   "license":     "GNU General Public License",
