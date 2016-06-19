@@ -1,0 +1,31 @@
+{
+  "name":        "mb-tec/zf-email",
+  "description": "Email service for Zend Framework 2",
+  "homepage":    "https://bitbucket.org/mbuesing/zf-email",
+  "type":        "library",
+  "license":     "GNU General Public License",
+  "keywords":   ["mb-tec", "email", "zf2", "zend", "framework"],
+  "authors": [
+    {
+      "name":     "Matthias Büsing",
+      "email":    "info@mb-tec.eu",
+      "homepage": "http://www.mb-tec.eu",
+      "role":     "Developer"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=5.5",
+    "zendframework/zend-version": "2.*"
+  },
+  "suggest": {
+    "zendframework/zend-modulemanager": "To use it as a Zend Framework module"
+  },
+  "require-dev": {
+    "zendframework/zend-version": "2.*"
+  },
+  "autoload": {
+    "psr-0": {"MBtecGoogleMaps": "src/"}
+  }
+}
