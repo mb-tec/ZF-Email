@@ -5,9 +5,9 @@ namespace MBtecZfEmail;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
-use MBtec\Email\Service\Email;
-use MBtec\Email\Service\Renderer;
-use MBtec\Email\Service\Transport;
+use MBtecZfEmail\Service\Email;
+use MBtecZfEmail\Service\Renderer;
+use MBtecZfEmail\Service\Transport;
 
 /**
  * Class        Module
@@ -20,9 +20,6 @@ use MBtec\Email\Service\Transport;
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ServiceProviderInterface
 {
     /**
-     * Return MBtec\Email autoload config.
-     *
-     * @see AutoloaderProviderInterface::getAutoloaderConfig()
      * @return array
      */
     public function getAutoloaderConfig()
@@ -35,10 +32,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
     }
 
     /**
-     * Return the MBtec\Email module config.
-     *
-     * @see ConfigProviderInterface::getConfig()
-     * @return array
+     * @return mixed
      */
     public function getConfig()
     {
@@ -52,19 +46,19 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
     {
         return [
             'factories' => [
-                'mbtec.email.email.service' => function ($sm) {
-                    $rendererService = $sm->get('mbtec.email.renderer.service');
-                    $transportService = $sm->get('mbtec.email.transport.service');
+                'mbtec.zfemail.email.service' => function ($sm) {
+                    $rendererService = $sm->get('mbtec.zfemail.renderer.service');
+                    $transportService = $sm->get('mbtec.zfemail.transport.service');
 
                     return new Email($rendererService, $transportService);
                 },
-                'mbtec.email.renderer.service' => function ($sm) {
+                'mbtec.zfemail.renderer.service' => function ($sm) {
                     $config = $sm->get('config');
                     $viewRenderer = $sm->get('ViewRenderer');
 
                     return new Renderer($config['mbtec']['email']['renderer'], $viewRenderer);
                 },
-                'mbtec.email.transport.service' => function ($sm) {
+                'mbtec.zfemail.transport.service' => function ($sm) {
                     $config = $sm->get('config');
 
                     return new Transport($config['mbtec']['email']['transport']);
