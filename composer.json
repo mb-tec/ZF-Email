@@ -18,7 +18,7 @@
   "require": {
     "php": ">=5.5",
     "zendframework/zend-version": "2.*",
-    "mb-tec/zf-log": "1.*"
+    "mb-tec/zf-log": "dev-master"
   },
   "suggest": {
     "zendframework/zend-modulemanager": "To use it as a Zend Framework module"
