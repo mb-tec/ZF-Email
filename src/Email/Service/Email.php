@@ -19,7 +19,10 @@ class Email
 
     protected $_tpl = null;
     protected $_variables = [];
-    protected $_options = [];
+    protected $_options = [
+        'use_default_sender' => true,
+        'add_footer' => true,
+    ];
 
     /**
      * @param Renderer $renderer
