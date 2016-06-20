@@ -17,7 +17,8 @@
   "prefer-stable": true,
   "require": {
     "php": ">=5.5",
-    "zendframework/zend-version": "2.*"
+    "zendframework/zend-version": "2.*",
+    "mb-tec/zf-log": "1.*"
   },
   "suggest": {
     "zendframework/zend-modulemanager": "To use it as a Zend Framework module"
@@ -26,6 +27,11 @@
     "zendframework/zend-version": "2.*"
   },
   "autoload": {
-    "psr-0": {"MBtecZfEmail": "src/"}
+    "psr-0": {
+      "MBtecZfEmail": "src/"
+    },
+    "classmap": [
+      "./Module.php"
+    ]
   }
 }

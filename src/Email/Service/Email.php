@@ -1,10 +1,10 @@
 <?php
 
-namespace MBtec\Email\Service;
+namespace MBtecZfEmail\Service;
 
 /**
  * Class        Email
- * @package     MBtec\Email\Service
+ * @package     MBtecZfEmail\Service
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
  * @license     GNU General Public License

@@ -1,12 +1,12 @@
 <?php
 
-namespace MBtec\Email\Exception;
+namespace MBtecZfEmail\Exception;
 
 use RuntimeException as BaseException;
 
 /**
  * Class        RuntimeException
- * @package     MBtec\Email\Exception
+ * @package     MBtecZfEmail\Exception
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
  * @license     GNU General Public License

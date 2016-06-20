@@ -1,6 +1,6 @@
 <?php
 
-namespace MBtec\Email\Service;
+namespace MBtecZfEmail\Service;
 
 use Exception;
 use Zend\Mail\Message;
@@ -10,7 +10,7 @@ use MBtec\Log\LogService;
 
 /**
  * Class        Transport
- * @package     MBtec\Email\Service
+ * @package     MBtecZfEmail\Service
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
  * @license     GNU General Public License

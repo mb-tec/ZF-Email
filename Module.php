@@ -1,6 +1,6 @@
 <?php
 
-namespace MBtec\Email;
+namespace MBtecZfEmail;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
@@ -11,7 +11,7 @@ use MBtec\Email\Service\Transport;
 
 /**
  * Class        Module
- * @package     MBtec\Email
+ * @package     MBtecZfEmail
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
  * @license     GNU General Public License
