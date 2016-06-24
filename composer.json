@@ -19,7 +19,7 @@
     "php": ">=5.5",
     "zendframework/zend-version": "2.*",
     "mb-tec/zf-log": "dev-master",
-    "mtibben/html2text": "4.0.1"
+    "html2text/html2text": "4.*"
   },
   "suggest": {
     "zendframework/zend-modulemanager": "To use it as a Zend Framework module"
