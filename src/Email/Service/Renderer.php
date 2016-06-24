@@ -6,6 +6,7 @@ use Zend\Mail;
 use Zend\Mime;
 use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
+use Html2Text\Html2Text;
 
 /**
  * Class        Renderer
@@ -239,23 +240,12 @@ class Renderer
         }
 
         if (!isset($plain)) {
-            $plain = $this->_getConverter()->convert($html);
+            $htmlConverter = Html2Text($html);
+            $plain = $htmlConverter->getText();
         }
 
         return array(
             $subject, $html, $plain
         );
-    }
-
-    /**
-     * @return HtmlConverter
-     */
-    protected function _getConverter()
-    {
-        if ($this->_converter === null) {
-            $this->_converter = new HtmlConverter();
-        }
-
-        return $this->_converter->reset();
     }
 }
