@@ -240,7 +240,7 @@ class Renderer
         }
 
         if (!isset($plain)) {
-            $htmlConverter = Html2Text($html);
+            $htmlConverter = new Html2Text($html);
             $plain = $htmlConverter->getText();
         }
 
