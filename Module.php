@@ -5,9 +5,7 @@ namespace MBtecZfEmail;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
-use MBtecZfEmail\Service\Email;
-use MBtecZfEmail\Service\Renderer;
-use MBtecZfEmail\Service\Transport;
+use MBtecZfEmail\Service;
 
 /**
  * Class        Module
@@ -50,18 +48,18 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
                     $rendererService = $sm->get('mbtec.zfemail.renderer.service');
                     $transportService = $sm->get('mbtec.zfemail.transport.service');
 
-                    return new Email($rendererService, $transportService);
+                    return new Service\Email($rendererService, $transportService);
                 },
                 'mbtec.zfemail.renderer.service' => function ($sm) {
-                    $config = $sm->get('config');
+                    $config = $sm->get('config')['mbtec']['zfemail']['renderer'];
                     $viewRenderer = $sm->get('ViewRenderer');
 
-                    return new Renderer($config['mbtec']['zfemail']['renderer'], $viewRenderer);
+                    return new Service\Renderer($config, $viewRenderer);
                 },
                 'mbtec.zfemail.transport.service' => function ($sm) {
-                    $config = $sm->get('config');
+                    $config = $sm->get('config')['mbtec']['zfemail']['transport'];
 
-                    return new Transport($config['mbtec']['zfemail']['transport']);
+                    return new Service\Transport($config);
                 },
             ],
         ];
