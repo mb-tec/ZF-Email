@@ -5,7 +5,6 @@ namespace MBtecZfEmail;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
-use MBtecZfEmail\Service;
 
 /**
  * Class        Module
