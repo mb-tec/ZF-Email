@@ -56,12 +56,12 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
                     $config = $sm->get('config');
                     $viewRenderer = $sm->get('ViewRenderer');
 
-                    return new Renderer($config['mbtec']['email']['renderer'], $viewRenderer);
+                    return new Renderer($config['mbtec']['zfemail']['renderer'], $viewRenderer);
                 },
                 'mbtec.zfemail.transport.service' => function ($sm) {
                     $config = $sm->get('config');
 
-                    return new Transport($config['mbtec']['email']['transport']);
+                    return new Transport($config['mbtec']['zfemail']['transport']);
                 },
             ],
         ];

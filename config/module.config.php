@@ -7,7 +7,7 @@
  */
 return [
     'mbtec' => [
-        'email' => [
+        'zfemail' => [
             'transport' => [
                 'type' => 'sendmail',
                 'options' => []
