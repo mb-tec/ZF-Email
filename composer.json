@@ -25,7 +25,7 @@
     "php": ">=5.6",
     "zendframework/zend-mail": "2.*",
     "zendframework/zend-crypt": "2.*",
-    "mb-tec/zf-log": "dev-master",
+    "mb-tec/zf-log": "1.*",
     "html2text/html2text": "4.*"
   },
   "suggest": {
