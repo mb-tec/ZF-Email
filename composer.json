@@ -23,16 +23,19 @@
   "prefer-stable": true,
   "require": {
     "php": ">=5.6",
-    "zendframework/zend-mail": "2.*",
-    "zendframework/zend-crypt": "3.*",
-    "html2text/html2text": "4.*"
+    "zendframework/zend-mail": "^2.0",
+    "zendframework/zend-crypt": "^3.0",
+    "html2text/html2text": "^4.0"
   },
   "suggest": {
     "zendframework/zend-modulemanager": "To use it as a Zend Framework module"
   },
   "autoload": {
     "psr-0": {
-      "MBtecZfEmail": "src/"
+      "MBtecZfEmail\\": "src/"
+    },
+    "psr-4": {
+      "MBtecZfEmail\\": "src/"
     },
     "classmap": [
       "./Module.php"

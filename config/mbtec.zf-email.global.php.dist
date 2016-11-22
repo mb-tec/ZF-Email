@@ -1,7 +1,7 @@
 <?php
  return [
      'mbtec' => [
-         'zfemail' => [
+         'zf-email' => [
              'transport' => [
                  'type' => 'smtp',
                  'options' => [
