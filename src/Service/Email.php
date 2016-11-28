@@ -161,7 +161,10 @@ class Email
     {
         $this->_tpl = null;
         $this->_variables = [];
-        $this->_options = [];
+        $this->_options = [
+            'use_default_sender' => true,
+            'add_footer' => true,
+        ];
         $this->_receivers = [];
         $this->_attachmentFiles = [];
 
