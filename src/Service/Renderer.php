@@ -130,26 +130,28 @@ class Renderer
             $contentTransferEncoding = Mail\Header\ContentTransferEncoding::fromString('Content-Transfer-Encoding: 8bit');
             $message->getHeaders()->addHeader($contentTransferEncoding);
         } else {
-            $html = new Mime\Part($html);
-            $html->type = Mime\Mime::TYPE_HTML;
-            $html->charset = 'UTF-8';
-            $html->disposition = Mime\Mime::DISPOSITION_INLINE;
-            $html->encoding = Mime\Mime::ENCODING_QUOTEDPRINTABLE;
+            $part = new Mime\Part($html);
+            $part
+                ->setType(Mime\Mime::TYPE_HTML)
+                ->setCharset('UTF-8')
+                ->setDisposition(Mime\Mime::DISPOSITION_INLINE)
+                ->setEncoding(Mime\Mime::ENCODING_QUOTEDPRINTABLE);
 
             $body = new Mime\Message();
-            $body->addPart($html);
+            $body->addPart($part);
 
             foreach ($attachments as $attachmentData) {
                 if (isset($attachmentData['file_path']) && is_readable($attachmentData['file_path'])) {
                     $attachmentData['file_data'] = file_get_contents($attachmentData['file_path']);
                 }
 
-                if (isset($attachmentData['file_data']) && !empty($attachmentData['file_data'])) {
+                if (isset($attachmentData['file_data']) && $attachmentData['file_data'] != '') {
                     $attachment = new Mime\Part($attachmentData['file_data']);
-                    $attachment->type = $attachmentData['mime_type'];
-                    $attachment->filename = $attachmentData['name'];
-                    $attachment->disposition = Mime\Mime::DISPOSITION_ATTACHMENT;
-                    $attachment->encoding = Mime\Mime::ENCODING_BASE64;
+                    $attachment
+                        ->setType($attachmentData['mime_type'])
+                        ->setFileName($attachmentData['name'])
+                        ->setDisposition(Mime\Mime::DISPOSITION_ATTACHMENT)
+                        ->setEncoding(Mime\Mime::ENCODING_BASE64);
 
                     $body->addPart($attachment);
                 }
@@ -221,12 +223,15 @@ class Renderer
                 case 'subject':
                     $subject = $parts[1];
                     break;
+
                 case 'html':
                     $html = $parts[1];
                     break;
+
                 case 'plain':
                     $plain = $parts[1];
                     break;
+
                 default:
             }
         }

@@ -141,6 +141,23 @@ class Email
     }
 
     /**
+     * @param $fileName
+     * @param $fileData
+     * @param $mime
+     * @return $this
+     */
+    public function addAttachmentData($fileName, $fileData, $mime)
+    {
+        $this->_attachmentFiles[] = [
+            'file_data' => $fileData,
+            'name' => $fileName,
+            'mime_type' => $mime,
+        ];
+
+        return $this;
+    }
+
+    /**
      * @throws \Exception
      */
     public function send()

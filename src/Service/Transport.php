@@ -2,11 +2,7 @@
 
 namespace MBtecZfEmail\Service;
 
-use Exception;
 use Zend\Mail\Message;
-use Zend\Mail\Transport as ZendTransport;
-use Zend\Log\Logger;
-use MBtec\Log\LogService;
 
 /**
  * Class        Transport
@@ -28,7 +24,6 @@ class Transport
 
     /**
      * @param Message $message
-     * @throws Exception
      */
     public function send(Message $message)
     {

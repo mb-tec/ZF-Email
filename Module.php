@@ -4,6 +4,7 @@ namespace MBtecZfEmail;
 
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
+use Zend\ServiceManager\ServiceManager;
 
 /**
  * Class        Module
@@ -30,20 +31,20 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface
     {
         return [
             'factories' => [
-                'mbtec.zf-email.email.service' => function ($sm) {
-                    $rendererService = $sm->get('mbtec.zf-email.renderer.service');
-                    $transportService = $sm->get('mbtec.zf-email.transport.service');
+                'mbtec.zf-email.email.service' => function (ServiceManager $oSm) {
+                    $rendererService = $oSm->get('mbtec.zf-email.renderer.service');
+                    $transportService = $oSm->get('mbtec.zf-email.transport.service');
 
                     return new Service\Email($rendererService, $transportService);
                 },
-                'mbtec.zf-email.renderer.service' => function ($sm) {
-                    $config = $sm->get('config')['mbtec']['zf-email']['renderer'];
-                    $viewRenderer = $sm->get('ViewRenderer');
+                'mbtec.zf-email.renderer.service' => function (ServiceManager $oSm) {
+                    $config = $oSm->get('config')['mbtec']['zf-email']['renderer'];
+                    $viewRenderer = $oSm->get('ViewRenderer');
 
                     return new Service\Renderer($config, $viewRenderer);
                 },
-                'mbtec.zf-email.transport.service' => function ($sm) {
-                    $config = $sm->get('config')['mbtec']['zf-email']['transport'];
+                'mbtec.zf-email.transport.service' => function (ServiceManager $oSm) {
+                    $config = $oSm->get('config')['mbtec']['zf-email']['transport'];
 
                     return new Service\Transport($config);
                 },
