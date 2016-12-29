@@ -72,16 +72,16 @@ script:
   ## PHP_CodeSniffer
   - if [[ $CHECK_CS == 'true' ]]; then composer cs-check ; fi
   ## PHP Copy/Paste Detector
-  - if [[ CHECK_CPD == 'true' ]]; then composer phpcpd src ; fi
+  - if [[ $CHECK_CPD == 'true' ]]; then composer phpcpd src ; fi
   ## PHP Mess Detector
-  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text cleancode ; fi
-  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text codesize ; fi
-  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text controversial ; fi
-  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text design ; fi
-  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text naming ; fi
-  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text unusedcode ; fi
+  - if [[ $CHECK_MD == 'true' ]]; then composer phpmd src text cleancode ; fi
+  - if [[ $CHECK_MD == 'true' ]]; then composer phpmd src text codesize ; fi
+  - if [[ $CHECK_MD == 'true' ]]; then composer phpmd src text controversial ; fi
+  - if [[ $CHECK_MD == 'true' ]]; then composer phpmd src text design ; fi
+  - if [[ $CHECK_MD == 'true' ]]; then composer phpmd src text naming ; fi
+  - if [[ $CHECK_MD == 'true' ]]; then composer phpmd src text unusedcode ; fi
   ## PHPLOC
-  - if [[ CHECK_LOC == 'true' ]]; then composer phploc src ; fi
+  - if [[ $CHECK_LOC == 'true' ]]; then composer phploc src ; fi
   ## PHPUNIT
   - composer phpunit
 
