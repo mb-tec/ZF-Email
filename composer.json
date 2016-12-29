@@ -63,6 +63,9 @@
     ],
     "cs-check": "phpcs",
     "cs-fix": "phpcbf",
-    "unittest": "phpunit --colors=always"
+    "phpcpd": "phpcpd",
+    "phpmd": "phpmd",
+    "phploc": "phploc",
+    "phpunit": "phpunit --colors=always"
   }
 }

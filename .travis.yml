@@ -1,10 +1,5 @@
 language: php
 
-php:
-  - '5.6'
-  - '7.0'
-  - '7.1'
-
 branches:
   except:
     - /^release-.*$/
@@ -25,6 +20,9 @@ matrix:
       env:
         - DEPS=latest
         - CHECK_CS=true
+        - CHECK_CPD=true
+        - CHECK_MD=true
+        - CHECK_LOC=true
     - php: 7
       env:
         - DEPS=lowest
@@ -72,23 +70,20 @@ before_script:
 
 script:
   ## PHP_CodeSniffer
-#  - php vendor/bin/phpcs --report=emacs --standard=PSR1 src
-#  - php vendor/bin/phpcs --report=emacs --standard=PSR2 src
-  ## PHP Copy/Paste Detector
-#  - php vendor/bin/phpcpd --verbose src
-  ## PHP Mess Detector
-#  - php vendor/bin/phpmd src text cleancode
-#  - php vendor/bin/phpmd src text codesize
-#  - php vendor/bin/phpmd src text controversial
-#  - php vendor/bin/phpmd src text design
-#  - php vendor/bin/phpmd src text naming
-#  - php vendor/bin/phpmd src text unusedcode
-  ## PHPLOC
-#  - php vendor/bin/phploc src
-  ## PHPUNIT
-#  - php vendor/bin/phpunit test
-  - composer unittest
   - if [[ $CHECK_CS == 'true' ]]; then composer cs-check ; fi
+  ## PHP Copy/Paste Detector
+  - if [[ CHECK_CPD == 'true' ]]; then composer phpcpd --verbose src ; fi
+  ## PHP Mess Detector
+  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text cleancode ; fi
+  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text codesize ; fi
+  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text controversial ; fi
+  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text design ; fi
+  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text naming ; fi
+  - if [[ CHECK_MD == 'true' ]]; then composer phpmd src text unusedcode ; fi
+  ## PHPLOC
+  - if [[ CHECK_LOC == 'true' ]]; then composer phploc src ; fi
+  ## PHPUNIT
+  - composer phpunit
 
 notifications:
   email: true
