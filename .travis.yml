@@ -1,8 +1,9 @@
 language: php
 
 php:
-  - "5.6"
-  - "7.0"
+  - '5.6'
+  - '7.0'
+  - '7.1'
 
 branches:
   except:
@@ -11,48 +12,31 @@ branches:
 env:
   global:
     - COMPOSER_ARGS="--no-interaction --ignore-platform-reqs"
-    - GH_USER_NAME="Matthuas Büsing"
-    - GH_USER_EMAIL=info@mb-tec.eu
-    - GH_REF=github.com/mb-tec/ZF-Email.git
 
 matrix:
-  fast_finish: true
   include:
     - php: 5.6
       env:
         - DEPS=lowest
     - php: 5.6
       env:
-        - DEPS=locked
-        - DEPLOY_DOCS="$(if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then echo -n 'true' ; else echo -n 'false' ; fi)"
-        - PATH="$HOME/.local/bin:$PATH"
-    - php: 5.6
-      env:
         - DEPS=latest
-        - TEST_COVERAGE=true
-    - php: 7
-      env:
-        - DEPS=lowest
-    - php: 7
-      env:
-        - DEPS=locked
         - CHECK_CS=true
     - php: 7
       env:
+        - DEPS=lowest
+    - php: 7
+      env:
         - DEPS=latest
     - php: hhvm
       env:
         - DEPS=lowest
-    - php: hhvm
-      env:
-        - DEPS=locked
     - php: hhvm
       env:
         - DEPS=latest
 
 before_install:
   - travis_retry composer self-update
-  - if [[ $TRAVIS_PHP_VERSION != "hhvm" && $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini ; fi
 
 install:
   - if [[ $DEPS == 'latest' ]]; then travis_retry composer update $COMPOSER_ARGS ; fi
@@ -62,23 +46,20 @@ install:
 
 script:
   ## PHP_CodeSniffer
-  - php vendor/bin/phpcs --report=emacs --standard=PSR1 src
-  - php vendor/bin/phpcs --report=emacs --standard=PSR2 src
+#  - php vendor/bin/phpcs --report=emacs --standard=PSR1 src
+#  - php vendor/bin/phpcs --report=emacs --standard=PSR2 src
   ## PHP Copy/Paste Detector
-  - php vendor/bin/phpcpd --verbose src
+#  - php vendor/bin/phpcpd --verbose src
   ## PHP Mess Detector
-  - php vendor/bin/phpmd src text cleancode
-  - php vendor/bin/phpmd src text codesize
-  - php vendor/bin/phpmd src text controversial
-  - php vendor/bin/phpmd src text design
-  - php vendor/bin/phpmd src text naming
-  - php vendor/bin/phpmd src text unusedcode
+#  - php vendor/bin/phpmd src text cleancode
+#  - php vendor/bin/phpmd src text codesize
+#  - php vendor/bin/phpmd src text controversial
+#  - php vendor/bin/phpmd src text design
+#  - php vendor/bin/phpmd src text naming
+#  - php vendor/bin/phpmd src text unusedcode
   ## PHPLOC
-  - php vendor/bin/phploc src
+#  - php vendor/bin/phploc src
   ## PHPUNIT
-  - php vendor/bin/phpunit test
-  - if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
+#  - php vendor/bin/phpunit test
+  - composer unittest
   - if [[ $CHECK_CS == 'true' ]]; then composer cs-check ; fi
-
-after_script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry composer upload-coverage ; fi
