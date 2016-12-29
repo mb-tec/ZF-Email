@@ -57,15 +57,11 @@
     }
   },
   "scripts": {
-    "check": [
-      "@cs-check",
-      "@test"
-    ],
     "cs-check": "phpcs",
     "cs-fix": "phpcbf",
     "phpcpd": "phpcpd",
     "phpmd": "phpmd",
-    "phploc": "phploc",
+    "phploc": "phploc src",
     "phpunit": "phpunit --colors=always"
   }
 }
