@@ -13,244 +13,418 @@ use Html2Text\Html2Text;
  * @package     MBtecZfEmail\Service
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
- * @license     GNU General Public License
+ * @license     GPL-2.0
  * @link        http://mb-tec.eu
  */
 class Renderer
 {
-    protected $_renderer = null;
-    protected $_converter = null;
+    protected $oRenderer = null;
+    protected $oConverter = null;
+    protected $oMessage = null;
+    protected $oHtml2Text = null;
 
-    protected $_rendererConfig = null;
+    protected $aRendererConfig = [];
 
     /**
-     * @param array $rendererConfig
-     * @param PhpRenderer $renderer
+     * Renderer constructor.
+     *
+     * @param array       $aRendererConfig
+     * @param PhpRenderer $oRenderer
      */
-    public function __construct(array $rendererConfig, PhpRenderer $renderer)
+    public function __construct(array $aRendererConfig, PhpRenderer $oRenderer)
     {
-        $this->_rendererConfig = $rendererConfig;
-        $this->_renderer = $renderer;
+        $this->aRendererConfig = $aRendererConfig;
+        $this->oRenderer = $oRenderer;
     }
 
     /**
-     * @param       $subject
-     * @param       $html
-     * @param       $plain
-     * @param array $options
-     * @param array $receivers
-     * @param array $attachments
+     * @param array $aMailData
+     * @param array $aOptions
+     * @param array $aReceivers
+     * @param array $aAtts
      *
      * @return Mail\Message
      */
-    protected function _assembleMailMessage(
-        $subject, $html, $plain, array $options, array $receivers, array $attachments = []
-    )
+    protected function assembleMailMessage(array $aMailData, array $aOptions, array $aReceivers, array $aAtts = [])
     {
-        $config = $this->_rendererConfig;
+        $aConfig = $this->aRendererConfig;
 
-        $message = new Mail\Message();
+        $oMessage = new Mail\Message();
+        $oMessage->setEncoding('UTF-8');
 
-        $message->setEncoding('UTF-8');
+        $this
+            ->setFrom($oMessage, $aConfig, $aOptions)
+            ->setTo($oMessage, $aReceivers, $aConfig)
+            ->addBcc($oMessage, $aConfig)
+            ->setSubject($oMessage, $aMailData['subject'], $aConfig)
+            ->setBody($oMessage, $aAtts, $aMailData['html'], $aMailData['plain']);
 
-        // Sender
-        if (isset($options['use_default_sender']) && $options['use_default_sender'] === true) {
-            $fromEmail = isset($config['mail_from_email'])
-                ? $config['mail_from_email']
+        return $oMessage;
+    }
+
+    /**
+     * @param Mail\Message $oMessage
+     * @param array        $aConfig
+     * @param array        $aOptions
+     *
+     * @return $this
+     */
+    protected function setFrom(Mail\Message $oMessage, array $aConfig, array $aOptions)
+    {
+        $aSenderData = $this->getSenderData($aConfig, $aOptions);
+
+        $oAddressList = new Mail\AddressList();
+        $oAddressList->add(
+            new Mail\Address($aSenderData['email'], (isset($aSenderData['name']) ? $aSenderData['name'] : null))
+        );
+
+        $oMessage->setFrom($oAddressList);
+
+        return $this;
+    }
+
+    /**
+     * @param array $aConfig
+     * @param array $aOptions
+     *
+     * @return array
+     */
+    protected function getSenderData(array $aConfig, array $aOptions)
+    {
+        if (isset($aOptions['use_default_sender']) && $aOptions['use_default_sender']) {
+            $sFromEmail = isset($aConfig['mail_from_email'])
+                ? $aConfig['mail_from_email']
                 : null;
 
-            $fromName = isset($config['mail_from_name'])
-                ? $config['mail_from_name']
-                : null;
-        } else {
-            $fromEmail = isset($options['sender_mail'])
-                ? $options['sender_mail']
+            $sFromName = isset($aConfig['mail_from_name'])
+                ? $aConfig['mail_from_name']
                 : null;
 
-            $fromName = isset($options['sender_name'])
-                ? $options['sender_name']
-                : null;
+            return [
+                'email' => $sFromEmail,
+                'name' => $sFromName,
+            ];
         }
 
-        $addressListFrom = new Mail\AddressList();
-        $addressListFrom->add(
-            new Mail\Address($fromEmail, (isset($fromName) ? $fromName : null))
-        );
-        $message->setFrom($addressListFrom);
+        $sFromEmail = isset($aOptions['sender_mail'])
+            ? $aOptions['sender_mail']
+            : null;
 
-        // Receiver
-        $addressListTo = new Mail\AddressList();
-        foreach ($receivers as $receiver) {
-            $recEmail = isset($config['email_receiver_override'])
-                ? $config['email_receiver_override']
-                : $receiver[0];
+        $sFromName = isset($aOptions['sender_name'])
+            ? $aOptions['sender_name']
+            : null;
 
-            $recName = isset($receiver[1])
-                ? $receiver[1]
+        return [
+            'email' => $sFromEmail,
+            'name' => $sFromName,
+        ];
+    }
+
+    /**
+     * @param Mail\Message $oMessage
+     * @param array        $aReceivers
+     * @param array        $aConfig
+     *
+     * @return $this
+     */
+    protected function setTo(Mail\Message $oMessage, array $aReceivers, array $aConfig)
+    {
+        $oAddressList = new Mail\AddressList();
+
+        foreach ($aReceivers as $aReceiver) {
+            $sRecEmail = isset($aConfig['email_receiver_override'])
+                ? $aConfig['email_receiver_override']
+                : $aReceiver[0];
+
+            $sRecName = isset($aReceiver[1])
+                ? $aReceiver[1]
                 : null;
 
-            $addressListTo->add(
-                new Mail\Address($recEmail, $recName)
+            $oAddressList->add(
+                new Mail\Address($sRecEmail, $sRecName)
             );
         }
-        $message->setTo($addressListTo);
 
-        if (isset($config['mail_bcc']) && is_array($config['mail_bcc'])) {
-            foreach ($config['mail_bcc'] as $bccAddress) {
+        $oMessage->setTo($oAddressList);
+
+        return $this;
+    }
+
+    /**
+     * @param Mail\Message $oMessage
+     * @param array        $aConfig
+     *
+     * @return $this
+     */
+    protected function addBcc(Mail\Message $oMessage, array $aConfig)
+    {
+        if (isset($aConfig['mail_bcc']) && is_array($aConfig['mail_bcc'])) {
+            foreach ($aConfig['mail_bcc'] as $sBccAddress) {
                 // Avoid sending email copy to "to" AND bcc
-                $found = false;
-                foreach ($message->getTo() as $to) {
-                    if ($to->getEmail() == $bccAddress) {
-                        $found = true;
+                $bFound = false;
+                foreach ($oMessage->getTo() as $oTo) {
+                    if ($oTo->getEmail() == $sBccAddress) {
+                        $bFound = true;
                         break;
                     }
                 }
-                if (!$found) {
-                    $addressListBcc = new Mail\AddressList();
-                    $addressListBcc->add(
-                        new Mail\Address($bccAddress)
+                if (!$bFound) {
+                    $oAddressListBcc = new Mail\AddressList();
+                    $oAddressListBcc->add(
+                        new Mail\Address($sBccAddress)
                     );
-                    $message->addBcc($addressListBcc);
+                    $oMessage->addBcc($oAddressListBcc);
                 }
             }
         }
 
-        if (isset($config['subject_prefix']) && $config['subject_prefix'] != '') {
-            $subject = $config['subject_prefix'] . $subject;
+        return $this;
+    }
+
+    /**
+     * @param Mail\Message $oMessage
+     * @param              $sSubject
+     * @param array        $aConfig
+     *
+     * @return $this
+     */
+    protected function setSubject(Mail\Message $oMessage, $sSubject, array $aConfig)
+    {
+        if (isset($aConfig['subject_prefix']) && $aConfig['subject_prefix'] != '') {
+            $sSubject = $aConfig['subject_prefix'] . $sSubject;
         }
 
-        $message->setSubject($subject);
+        $oMessage->setSubject($sSubject);
 
-        if (empty($attachments)) {
-            $message->setBody($html);
+        return $this;
+    }
 
-            $contentType = Mail\Header\ContentType::fromString('Content-Type: text/html; charset=utf-8');
-            $message->getHeaders()->addHeader($contentType);
+    /**
+     * @param Mail\Message $oMessage
+     * @param array        $aAttachments
+     * @param              $sHtml
+     * @param              $sPlain
+     *
+     * @return $this
+     */
+    protected function setBody(Mail\Message $oMessage, array $aAttachments, $sHtml, $sPlain)
+    {
+        if (empty($aAttachments)) {
+            $this->setBodyWithoutAttachments($oMessage, $sHtml, $sPlain);
 
-            $contentTransferEncoding = Mail\Header\ContentTransferEncoding::fromString('Content-Transfer-Encoding: 8bit');
-            $message->getHeaders()->addHeader($contentTransferEncoding);
-        } else {
-            $part = new Mime\Part($html);
-            $part
-                ->setType(Mime\Mime::TYPE_HTML)
+            return $this;
+        }
+
+        $this->setBodyWithAttachments($oMessage, $aAttachments, $sHtml, $sPlain);
+
+        return $this;
+    }
+
+    /**
+     * @param Mail\Message $oMessage
+     * @param              $sHtml
+     * @param              $sPlain
+     *
+     * @return $this
+     */
+    protected function setBodyWithoutAttachments(Mail\Message $oMessage, $sHtml, $sPlain)
+    {
+        $oContent = $this->getContentMessage($sHtml, $sPlain);
+        $oMessage->setBody($oContent);
+
+        $oHeaders = $oMessage->getHeaders();
+
+        if (!$oHeaders->has('Content-Type')) {
+            $oHeader = new Mail\Header\ContentType();
+            $oHeaders->addHeader($oHeader);
+        }
+
+        $oHeaders->get('Content-Type')->setType(Mime\Mime::MULTIPART_ALTERNATIVE);
+
+        return $this;
+    }
+
+    /**
+     * @param Mail\Message $oMessage
+     * @param array        $aAttachments
+     * @param              $sHtml
+     * @param              $sPlain
+     *
+     * @return $this
+     */
+    protected function setBodyWithAttachments(Mail\Message $oMessage, array $aAttachments, $sHtml, $sPlain)
+    {
+        $oContent = $this->getContentMessage($sHtml, $sPlain);
+
+        $oContentPart = new Mime\Part($oContent->generateMessage());
+        $oContentPart->setType(Mime\Mime::MULTIPART_ALTERNATIVE);
+        $oContentPart->setBoundary($oContent->getMime()->boundary());
+
+        $oBody = new Mime\Message();
+        $oBody->addPart($oContentPart);
+
+        foreach ($aAttachments as $aAttachmentData) {
+            if (isset($aAttachmentData['file_path']) && is_readable($aAttachmentData['file_path'])) {
+                $aAttachmentData['file_data'] = file_get_contents($aAttachmentData['file_path']);
+            }
+
+            if (isset($aAttachmentData['file_data']) && $aAttachmentData['file_data'] != '') {
+                $oAttachment = new Mime\Part();
+                $oAttachment
+                    ->setContent($aAttachmentData['file_data'])
+                    ->setType(Mime\Mime::TYPE_OCTETSTREAM)
+                    ->setFileName($aAttachmentData['name'])
+                    ->setDisposition(Mime\Mime::DISPOSITION_ATTACHMENT)
+                    ->setEncoding(Mime\Mime::ENCODING_BASE64);
+
+                $oBody->addPart($oAttachment);
+            }
+        }
+
+        $oMessage->setBody($oBody);
+
+        return $this;
+    }
+
+    /**
+     * @param $sHtml
+     * @param $sPlain
+     *
+     * @return Mime\Message
+     */
+    protected function getContentMessage($sHtml, $sPlain)
+    {
+        $oMessage = new Mime\Message();
+
+        if ($sPlain != '') {
+            $oPlain = new Mime\Part();
+            $oPlain
+                ->setContent($sPlain)
+                ->setType(Mime\Mime::TYPE_TEXT)
                 ->setCharset('UTF-8')
-                ->setDisposition(Mime\Mime::DISPOSITION_INLINE)
                 ->setEncoding(Mime\Mime::ENCODING_QUOTEDPRINTABLE);
 
-            $body = new Mime\Message();
-            $body->addPart($part);
-
-            foreach ($attachments as $attachmentData) {
-                if (isset($attachmentData['file_path']) && is_readable($attachmentData['file_path'])) {
-                    $attachmentData['file_data'] = file_get_contents($attachmentData['file_path']);
-                }
-
-                if (isset($attachmentData['file_data']) && $attachmentData['file_data'] != '') {
-                    $attachment = new Mime\Part($attachmentData['file_data']);
-                    $attachment
-                        ->setType($attachmentData['mime_type'])
-                        ->setFileName($attachmentData['name'])
-                        ->setDisposition(Mime\Mime::DISPOSITION_ATTACHMENT)
-                        ->setEncoding(Mime\Mime::ENCODING_BASE64);
-
-                    $body->addPart($attachment);
-                }
-            }
-
-            $message->setBody($body);
+            $oMessage->addPart($oPlain);
         }
 
-        return $message;
+        if ($sHtml != '') {
+            $oHtml = new Mime\Part();
+            $oHtml
+                ->setContent($sHtml)
+                ->setType(Mime\Mime::TYPE_HTML)
+                ->setCharset('UTF-8')
+                ->setEncoding(Mime\Mime::ENCODING_QUOTEDPRINTABLE);
+
+            $oMessage->addPart($oHtml);
+        }
+
+        return $oMessage;
     }
 
     /**
-     * @param $tpl
-     * @param array $variables
-     * @param array $options
-     * @param array $receivers
-     * @param array $attachmentFiles
+     * @param       $sTpl
+     * @param array $aVars
+     * @param array $aOpts
+     * @param array $aRecs
+     * @param array $aAtts
+     *
      * @return Mail\Message
      */
-    public function renderTemplate(
-        $tpl, array $variables, array $options, array $receivers, array $attachmentFiles = []
-    )
+    public function renderTemplate($sTpl, array $aVars, array $aOpts, array $aRecs, array $aAtts = [])
     {
-        list($subject, $html, $plain) = $this->_getTemplateData($tpl, $variables);
+        $aMailData = $this->getMailData($sTpl, $aVars);
 
         // Add Footer
-        if (isset($options['add_footer']) && $options['add_footer']) {
-            $templateNameData = explode('/', $tpl);
-            $footerTpl = sprintf('%s/email/_footer', $templateNameData[0]);
+        if (isset($aOpts['add_footer']) && $aOpts['add_footer']) {
+            $templateNameData = explode('/', $sTpl);
+            $sFooterTpl = sprintf('%s/email/_footer', $templateNameData[0]);
 
-            list($footerSubject, $footerHtml, $footerPlain) = $this->_getTemplateData($footerTpl, $variables);
+            $aFooterData = $this->getMailData($sFooterTpl, $aVars);
 
-            $html .= $footerHtml;
-            $plain .= $footerPlain;
+            $aMailData['html'] .= $aFooterData['html'];
+            $aMailData['plain'] .= $aFooterData['plain'];
         }
 
-        return $this->_assembleMailMessage($subject, $html, $plain, $options, $receivers, $attachmentFiles);
+        return $this->assembleMailMessage($aMailData, $aOpts, $aRecs, $aAtts);
     }
 
     /**
-     * Render a given template with given data assigned.
+     * @param       $sTpl
+     * @param array $aData
      *
-     * @param  string $tpl
-     * @param  array $data
-     * @return string The rendered content.
+     * @return string
      */
-    protected function _renderMail($tpl, array $data = [])
+    protected function renderMail($sTpl, array $aData = [])
     {
-        $viewModel = new ViewModel($data);
-        $viewModel->setTemplate($tpl);
+        $oViewModel = new ViewModel($aData);
+        $oViewModel->setTemplate($sTpl);
 
-        return $this->_renderer->render($viewModel);
+        return $this->oRenderer->render($oViewModel);
     }
 
     /**
-     * @param $tpl
-     * @param array $variables
+     * @param       $sTpl
+     * @param array $aVariables
+     *
      * @return array
      */
-    protected function _getTemplateData($tpl, array $variables = [])
+    protected function getMailData($sTpl, array $aVariables = [])
     {
-        $tplData = explode('######', $this->_renderMail($tpl, $variables));
-        $tplData = array_map('trim', $tplData);
+        $sSubject = $sHtml = $sPlain = null;
 
-        foreach ($tplData as $row) {
-            $parts = array_map('trim', explode(':', $row, 2));
+        $aTplData = explode('######', $this->renderMail($sTpl, $aVariables));
+        $aTplData = array_map('trim', $aTplData);
 
-            switch (strtolower($parts[0])) {
+        foreach ($aTplData as $sRow) {
+            $aParts = array_map('trim', explode(':', $sRow, 2));
+
+            switch (strtolower($aParts[0])) {
                 case 'subject':
-                    $subject = $parts[1];
+                    $sSubject = $aParts[1];
                     break;
 
                 case 'html':
-                    $html = $parts[1];
+                    $sHtml = $aParts[1];
                     break;
 
                 case 'plain':
-                    $plain = $parts[1];
+                    $sPlain = $aParts[1];
                     break;
 
                 default:
             }
         }
 
-        if (!isset($subject)) {
-            $subject = 'Missing subject';
+        if ($sSubject === null) {
+            $sSubject = 'Missing subject';
         }
 
-        if (!isset($html)) {
-            $html = 'Missing html content';
+        if ($sHtml === null) {
+            $sHtml = 'Missing html content';
         }
 
-        if (!isset($plain)) {
-            $htmlConverter = new Html2Text($html);
-            $plain = $htmlConverter->getText();
+        if ($sPlain === null) {
+            $oHtmlConverter = $this->getHtml2Text();
+            $oHtmlConverter->setHtml($sHtml);
+            $sPlain = $oHtmlConverter->getText();
         }
 
-        return array(
-            $subject, $html, $plain
-        );
+        return [
+            'subject' => $sSubject,
+            'html' => $sHtml,
+            'plain' => $sPlain,
+        ];
+    }
+
+    /**
+     * @return Html2Text
+     */
+    protected function getHtml2Text()
+    {
+        if (!is_object($this->oHtml2Text)) {
+            $this->oHtml2Text = new Html2Text();
+        }
+
+        return $this->oHtml2Text;
     }
 }

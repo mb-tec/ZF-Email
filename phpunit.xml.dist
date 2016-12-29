@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         colors="true">
+    <testsuites>
+        <testsuite name="zf-FullUrl">
+            <directory>./test/</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <var name="receiver" value="info@mb-tec.eu"/>
+        <var name="receiver_override" value="nite74@web.de"/>
+        <var name="receiver_bcc" value="m@tthias.biz"/>
+    </php>
+</phpunit>

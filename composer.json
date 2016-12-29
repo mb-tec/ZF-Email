@@ -3,7 +3,7 @@
   "description": "Email Service for Zend Framework 3",
   "homepage": "https://bitbucket.org/mbuesing/zf-email",
   "type": "library",
-  "license": "GPL-3.0",
+  "license": "GPL-2.0",
   "keywords": [
     "mb-tec",
     "email",
@@ -22,11 +22,20 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=5.6",
+    "php": "^5.6 || ^7.0",
     "zendframework/zend-mail": "^2.0",
     "zendframework/zend-mime": "^2.0",
     "zendframework/zend-view": "^2.0",
-    "html2text/html2text": "^4.0"
+    "html2text/html2text": "^4.0",
+    "zendframework/zend-servicemanager": "^3.2"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^2.7",
+    "zendframework/zend-coding-standard": "^1.0",
+    "phpunit/phpunit": "^5.7",
+    "phpmd/phpmd": "^2.5",
+    "sebastian/phpcpd": "^2.0",
+    "phploc/phploc": "^3.0"
   },
   "suggest": {
     "zendframework/zend-modulemanager": "To use it as a Zend Framework module"
@@ -41,5 +50,21 @@
     "classmap": [
       "./Module.php"
     ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MBtecZfFullUrl\\Test\\": "./test/"
+    }
+  },
+  "scripts": {
+    "check": [
+      "@cs-check",
+      "@test"
+    ],
+    "cs-check": "phpcs",
+    "cs-fix": "phpcbf",
+    "test": "phpunit --colors=always",
+    "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
+    "upload-coverage": "coveralls -v"
   }
 }

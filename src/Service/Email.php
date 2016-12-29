@@ -7,84 +7,90 @@ namespace MBtecZfEmail\Service;
  * @package     MBtecZfEmail\Service
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
- * @license     GNU General Public License
+ * @license     GPL-2.0
  * @link        http://mb-tec.eu
  */
 class Email
 {
-    protected $_transport = null;
-    protected $_renderer = null;
-    protected $_receivers = [];
-    protected $_attachmentFiles = [];
+    protected $oTransport = null;
+    protected $oRenderer = null;
+    protected $aReceivers = [];
+    protected $aAttachmentFiles = [];
 
-    protected $_tpl = null;
-    protected $_variables = [];
-    protected $_options = [
+    protected $sTpl = null;
+    protected $aVariables = [];
+    protected $aOptions = [
         'use_default_sender' => true,
         'add_footer' => true,
     ];
 
     /**
-     * @param Renderer $renderer
-     * @param Transport $transport
+     * Email constructor.
+     *
+     * @param Renderer  $oRenderer
+     * @param Transport $oTransport
      */
-    public function __construct(Renderer $renderer, Transport $transport)
+    public function __construct(Renderer $oRenderer, Transport $oTransport)
     {
-        $this->_renderer = $renderer;
-        $this->_transport = $transport;
+        $this->oRenderer = $oRenderer;
+        $this->oTransport = $oTransport;
     }
 
     /**
-     * @param $email
-     * @param null $name
+     * @param      $sEmail
+     * @param null $sName
+     *
      * @return $this
      */
-    public function addReceiver($email, $name = null)
+    public function addReceiver($sEmail, $sName = null)
     {
-        $receiver = array($email);
-        if (is_string($name)) {
-            $receiver[] = $name;
+        $aRceiver = [$sEmail];
+        if (is_string($sName)) {
+            $aRceiver[] = $sName;
         }
 
-        $this->_receivers[] = $receiver;
+        $this->aReceivers[] = $aRceiver;
 
         return $this;
     }
 
     /**
-     * @param $bool
+     * @param $bBool
+     *
      * @return $this
      */
-    public function setDefaultSender($bool)
+    public function setDefaultSender($bBool)
     {
-        $this->_options['use_default_sender'] = (bool) $bool;
+        $this->aOptions['use_default_sender'] = (bool)$bBool;
 
         return $this;
     }
 
     /**
-     * @param $senderMail
-     * @param null $senderName
+     * @param      $sSenderMail
+     * @param null $sSenderName
+     *
      * @return $this
      */
-    public function setSender($senderMail, $senderName = null)
+    public function setSender($sSenderMail, $sSenderName = null)
     {
-        $this->_options['sender_mail'] = (string) $senderMail;
+        $this->aOptions['sender_mail'] = (string)$sSenderMail;
 
-        if ($senderName) {
-            $this->_options['sender_name'] = (string) $senderName;
+        if ($sSenderName) {
+            $this->aOptions['sender_name'] = (string)$sSenderName;
         }
 
         return $this;
     }
 
     /**
-     * @param $tpl
+     * @param $sTpl
+     *
      * @return $this
      */
-    public function setTemplate($tpl)
+    public function setTemplate($sTpl)
     {
-        $this->_tpl = $tpl;
+        $this->sTpl = $sTpl;
 
         return $this;
     }
@@ -100,58 +106,58 @@ class Email
     }
 
     /**
-     * @param $var
-     * @param $val
+     * @param $mVar
+     * @param $mVal
+     *
      * @return $this
      */
-    public function setVariable($var, $val)
+    public function setVariable($mVar, $mVal)
     {
-        $this->_variables[$var] = $val;
+        $this->aVariables[$mVar] = $mVal;
 
         return $this;
     }
 
     /**
-     * @param $var
-     * @param $val
+     * @param $mVar
+     * @param $mVal
+     *
      * @return $this
      */
-    public function setOption($var, $val)
+    public function setOption($mVar, $mVal)
     {
-        $this->_options[$var] = $val;
+        $this->aOptions[$mVar] = $mVal;
 
         return $this;
     }
 
     /**
-     * @param $fileName
-     * @param $filePath
-     * @param $mime
+     * @param $sFileName
+     * @param $fFilePath
+     *
      * @return $this
      */
-    public function addAttachmentFile($fileName, $filePath, $mime)
+    public function addAttachmentFile($sFileName, $fFilePath)
     {
-        $this->_attachmentFiles[] = [
-            'file_path' => $filePath,
-            'name' => $fileName,
-            'mime_type' => $mime,
+        $this->aAttachmentFiles[] = [
+            'file_path' => $fFilePath,
+            'name' => $sFileName,
         ];
 
         return $this;
     }
 
     /**
-     * @param $fileName
-     * @param $fileData
-     * @param $mime
+     * @param $sFileName
+     * @param $sFileData
+     *
      * @return $this
      */
-    public function addAttachmentData($fileName, $fileData, $mime)
+    public function addAttachmentData($sFileName, $sFileData)
     {
-        $this->_attachmentFiles[] = [
-            'file_data' => $fileData,
-            'name' => $fileName,
-            'mime_type' => $mime,
+        $this->aAttachmentFiles[] = [
+            'file_data' => $sFileData,
+            'name' => $sFileName,
         ];
 
         return $this;
@@ -162,8 +168,8 @@ class Email
      */
     public function send()
     {
-        $this->_transport->send(
-            $this->_getMessage()
+        $this->oTransport->send(
+            $this->getMessage()
         );
 
         $this->reset();
@@ -176,14 +182,14 @@ class Email
      */
     public function reset()
     {
-        $this->_tpl = null;
-        $this->_variables = [];
-        $this->_options = [
+        $this->sTpl = null;
+        $this->aVariables = [];
+        $this->aOptions = [
             'use_default_sender' => true,
             'add_footer' => true,
         ];
-        $this->_receivers = [];
-        $this->_attachmentFiles = [];
+        $this->aReceivers = [];
+        $this->aAttachmentFiles = [];
 
         return $this;
     }
@@ -191,10 +197,14 @@ class Email
     /**
      * @return \Zend\Mail\Message
      */
-    protected function _getMessage()
+    protected function getMessage()
     {
-        return $this->_renderer->renderTemplate(
-            $this->_tpl, $this->_variables, $this->_options, $this->_receivers, $this->_attachmentFiles
+        return $this->oRenderer->renderTemplate(
+            $this->sTpl,
+            $this->aVariables,
+            $this->aOptions,
+            $this->aReceivers,
+            $this->aAttachmentFiles
         );
     }
 }

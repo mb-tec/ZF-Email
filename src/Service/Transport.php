@@ -9,53 +9,59 @@ use Zend\Mail\Message;
  * @package     MBtecZfEmail\Service
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
- * @license     GNU General Public License
+ * @license     GPL-2.0
  * @link        http://mb-tec.eu
  */
 class Transport
 {
+    /** @var \Zend\Mail\Transport\TransportInterface */
+    protected $oTransport = null;
+
     /**
-     * @param array $config
+     * Transport constructor.
+     *
+     * @param array $aConfig
      */
-    public function __construct(array $config)
+    public function __construct(array $aConfig)
     {
-        $this->_transport = $this->_getTransport($config);
+        $this->oTransport = $this->initTransport($aConfig);
     }
 
     /**
-     * @param Message $message
+     * @param Message $oMessage
      */
-    public function send(Message $message)
+    public function send(Message $oMessage)
     {
-        $this->_transport->send($message);
+        $this->oTransport->send($oMessage);
     }
 
     /**
-     * @return mixed
+     * @return \Zend\Mail\Transport\TransportInterface
      */
     public function getTransport()
     {
-        return $this->_transport;
+        return $this->oTransport;
     }
 
     /**
-     * @param array $config
-     * @return mixed
+     * @param array $aConfig
+     *
+     * @return \Zend\Mail\Transport\TransportInterface
      */
-    protected static function _getTransport(array $config)
+    protected static function initTransport(array $aConfig)
     {
-        $type = '\Zend\Mail\Transport\\' . ucfirst($config['type']);
-        $transport = new $type();
+        $sType = '\Zend\Mail\Transport\\' . ucfirst($aConfig['type']);
+        $oTransport = new $sType();
 
-        if (isset($config['options'])) {
-            $optionsClass = $type . 'Options';
-            if (class_exists($optionsClass) && method_exists($transport, 'setOptions')) {
-                $transport->setOptions(
-                    new $optionsClass($config['options'])
+        if (isset($aConfig['options'])) {
+            $sOptionsClass = $sType . 'Options';
+            if (class_exists($sOptionsClass) && method_exists($oTransport, 'setOptions')) {
+                $oTransport->setOptions(
+                    new $sOptionsClass($aConfig['options'])
                 );
             }
         }
 
-        return $transport;
+        return $oTransport;
     }
 }

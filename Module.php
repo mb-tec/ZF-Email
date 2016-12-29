@@ -11,7 +11,7 @@ use Zend\ServiceManager\ServiceManager;
  * @package     MBtecZfEmail
  * @author      Matthias Büsing <info@mb-tec.eu>
  * @copyright   2016 Matthias Büsing
- * @license     GNU General Public License
+ * @license     GPL-2.0
  * @link        http://mb-tec.eu
  */
 class Module implements ConfigProviderInterface, ServiceProviderInterface
@@ -32,21 +32,21 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface
         return [
             'factories' => [
                 'mbtec.zf-email.email.service' => function (ServiceManager $oSm) {
-                    $rendererService = $oSm->get('mbtec.zf-email.renderer.service');
-                    $transportService = $oSm->get('mbtec.zf-email.transport.service');
+                    $oRenderer = $oSm->get('mbtec.zf-email.renderer.service');
+                    $oTransport = $oSm->get('mbtec.zf-email.transport.service');
 
-                    return new Service\Email($rendererService, $transportService);
+                    return new Service\Email($oRenderer, $oTransport);
                 },
                 'mbtec.zf-email.renderer.service' => function (ServiceManager $oSm) {
-                    $config = $oSm->get('config')['mbtec']['zf-email']['renderer'];
-                    $viewRenderer = $oSm->get('ViewRenderer');
+                    $aConfig = (array)$oSm->get('config')['mbtec']['zf-email']['renderer'];
+                    $oViewRenderer = $oSm->get('ViewRenderer');
 
-                    return new Service\Renderer($config, $viewRenderer);
+                    return new Service\Renderer($aConfig, $oViewRenderer);
                 },
                 'mbtec.zf-email.transport.service' => function (ServiceManager $oSm) {
-                    $config = $oSm->get('config')['mbtec']['zf-email']['transport'];
+                    $aConfig = (array)$oSm->get('config')['mbtec']['zf-email']['transport'];
 
-                    return new Service\Transport($config);
+                    return new Service\Transport($aConfig);
                 },
             ],
         ];
