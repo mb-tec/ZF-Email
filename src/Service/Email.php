@@ -13,9 +13,10 @@ namespace MBtecZfEmail\Service;
 class Email
 {
     protected $oTransport = null;
+    protected $oMessage = null;
     protected $oRenderer = null;
     protected $aReceivers = [];
-    protected $aAttachmentFiles = [];
+    protected $aAttachments = [];
 
     protected $sTpl = null;
     protected $aVariables = [];
@@ -28,11 +29,13 @@ class Email
      * Email constructor.
      *
      * @param Renderer  $oRenderer
+     * @param Message   $oMessage
      * @param Transport $oTransport
      */
-    public function __construct(Renderer $oRenderer, Transport $oTransport)
+    public function __construct(Renderer $oRenderer, Message $oMessage, Transport $oTransport)
     {
         $this->oRenderer = $oRenderer;
+        $this->oMessage = $oMessage;
         $this->oTransport = $oTransport;
     }
 
@@ -139,7 +142,7 @@ class Email
      */
     public function addAttachmentFile($sFileName, $fFilePath)
     {
-        $this->aAttachmentFiles[] = [
+        $this->aAttachments[] = [
             'file_path' => $fFilePath,
             'name' => $sFileName,
         ];
@@ -155,7 +158,7 @@ class Email
      */
     public function addAttachmentData($sFileName, $sFileData)
     {
-        $this->aAttachmentFiles[] = [
+        $this->aAttachments[] = [
             'file_data' => $sFileData,
             'name' => $sFileName,
         ];
@@ -168,9 +171,10 @@ class Email
      */
     public function send()
     {
-        $this->oTransport->send(
-            $this->getMessage()
-        );
+        $aMailData = $this->oRenderer->renderTemplate($this->sTpl, $this->aVariables, $this->aOptions);
+        $oMessage = $this->oMessage->createMessage($aMailData, $this->aOptions, $this->aReceivers, $this->aAttachments);
+
+        $this->oTransport->send($oMessage);
 
         $this->reset();
 
@@ -189,22 +193,8 @@ class Email
             'add_footer' => true,
         ];
         $this->aReceivers = [];
-        $this->aAttachmentFiles = [];
+        $this->aAttachments = [];
 
         return $this;
-    }
-
-    /**
-     * @return \Zend\Mail\Message
-     */
-    protected function getMessage()
-    {
-        return $this->oRenderer->renderTemplate(
-            $this->sTpl,
-            $this->aVariables,
-            $this->aOptions,
-            $this->aReceivers,
-            $this->aAttachmentFiles
-        );
     }
 }

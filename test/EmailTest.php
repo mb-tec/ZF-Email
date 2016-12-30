@@ -5,9 +5,7 @@ namespace MBtecZfEmail\Test;
 use Exception;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver\TemplateMapResolver;
-use MBtecZfEmail\Service\Renderer;
-use MBtecZfEmail\Service\Transport;
-use MBtecZfEmail\Service\Email;
+use MBtecZfEmail\Service;
 use PHPUnit_Framework_TestCase as TestCase;
 
 /**
@@ -153,7 +151,7 @@ class EmailTest extends TestCase
     /**
      * @param array $aConfig
      *
-     * @return Email
+     * @return Service\Email
      */
     protected function getEmailService(array $aConfig)
     {
@@ -172,10 +170,11 @@ class EmailTest extends TestCase
         $oViewRenderer = new PhpRenderer();
         $oViewRenderer->setResolver($oResolver);
 
-        $oRenderer = new Renderer($aRendererConfig, $oViewRenderer);
-        $oTransport = new Transport($aTransportConfig);
+        $oRenderer = new Service\Renderer($oViewRenderer, $aRendererConfig);
+        $oMessage = new Service\Message($aRendererConfig);
+        $oTransport = new Service\Transport($aTransportConfig);
 
-        $oEmail = new Email($oRenderer, $oTransport);
+        $oEmail = new Service\Email($oRenderer, $oMessage, $oTransport);
 
         return $oEmail;
     }

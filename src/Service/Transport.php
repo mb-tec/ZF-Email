@@ -2,7 +2,7 @@
 
 namespace MBtecZfEmail\Service;
 
-use Zend\Mail\Message;
+use Zend\Mail\Message as ZendMailMessage;
 
 /**
  * Class        Transport
@@ -28,9 +28,9 @@ class Transport
     }
 
     /**
-     * @param Message $oMessage
+     * @param ZendMailMessage $oMessage
      */
-    public function send(Message $oMessage)
+    public function send(ZendMailMessage $oMessage)
     {
         $this->oTransport->send($oMessage);
     }

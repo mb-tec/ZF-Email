@@ -33,15 +33,21 @@ class Module implements ConfigProviderInterface, ServiceProviderInterface
             'factories' => [
                 'mbtec.zf-email.email.service' => function (ServiceManager $oSm) {
                     $oRenderer = $oSm->get('mbtec.zf-email.renderer.service');
+                    $oMessage = $oSm->get('mbtec.zf-email.message.service');
                     $oTransport = $oSm->get('mbtec.zf-email.transport.service');
 
-                    return new Service\Email($oRenderer, $oTransport);
+                    return new Service\Email($oRenderer, $oMessage, $oTransport);
+                },
+                'mbtec.zf-email.message.service' => function (ServiceManager $oSm) {
+                    $aConfig = (array)$oSm->get('config')['mbtec']['zf-email']['renderer'];
+
+                    return new Service\Message($aConfig);
                 },
                 'mbtec.zf-email.renderer.service' => function (ServiceManager $oSm) {
-                    $aConfig = (array)$oSm->get('config')['mbtec']['zf-email']['renderer'];
                     $oViewRenderer = $oSm->get('ViewRenderer');
+                    $aConfig = (array)$oSm->get('config')['mbtec']['zf-email']['renderer'];
 
-                    return new Service\Renderer($aConfig, $oViewRenderer);
+                    return new Service\Renderer($oViewRenderer, $aConfig);
                 },
                 'mbtec.zf-email.transport.service' => function (ServiceManager $oSm) {
                     $aConfig = (array)$oSm->get('config')['mbtec']['zf-email']['transport'];
